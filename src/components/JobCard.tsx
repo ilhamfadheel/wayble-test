@@ -18,7 +18,7 @@ export default function JobCard(job: JobListing) {
   };
 
   return (
-    <div className="card bg-base-100 image-full w-96 shadow-xl ">
+    <div className="card bg-base-100 image-full w-96 shadow-xl max-h-[24rem]">
       <figure>
         <img
           src="https://images.pexels.com/photos/380769/pexels-photo-380769.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
