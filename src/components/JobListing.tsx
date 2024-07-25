@@ -20,7 +20,7 @@ export default function JobListing() {
     return <Loading />;
   }
   return (
-    <section className="flex flex-wrap justify-center gap-4 overflow-y-auto pb-20">
+    <section className="flex flex-wrap justify-center gap-4 h-full overflow-y-auto pb-20">
       {jobList.map((job: JobListing) => (
         <JobCard key={job.id} {...job} />
       ))}
