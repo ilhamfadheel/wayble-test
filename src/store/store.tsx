@@ -9,6 +9,7 @@ import logger, { createLogger } from 'redux-logger';
 
 interface JobState {
   jobList: JobListing[];
+  justLoggedIn: boolean;
 }
 
 export interface JobListing {
@@ -28,6 +29,7 @@ export interface JobListing {
 
 const initialState: JobState = {
   jobList: [],
+  justLoggedIn: false,
 };
 
 const jobSlice = createSlice({
@@ -44,7 +46,11 @@ const jobSlice = createSlice({
         };
       }
     },
+    setJustLoggedIn: (state, action: PayloadAction<boolean>) => {
+      state.justLoggedIn = action.payload;
+    },
     userLogout: (state) => {
+      state.justLoggedIn = false;
       state.jobList = state.jobList.map((job) => ({
         ...job,
         applyState: false,
@@ -55,7 +61,6 @@ const jobSlice = createSlice({
     builder.addCase(fetchJobs.fulfilled, (state, action) => {
       state.jobList = action.payload;
     });
-    // Handle other states (pending, rejected) if needed
   },
 });
 
@@ -71,7 +76,7 @@ const loggerMiddleware = createLogger({
 
 const persistedReducer = persistReducer(persistConfig, jobSlice.reducer);
 
-export const { applyJob, userLogout } = jobSlice.actions;
+export const { applyJob, setJustLoggedIn, userLogout } = jobSlice.actions;
 
 const store = configureStore({
   reducer: {

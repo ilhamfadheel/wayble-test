@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSession } from 'next-auth/react';
-import LoginDialog, { openModal } from '@/components/LoginDialog';
-import { applyJob, JobListing } from '@/store/store';
+import { JobListing } from '@/store/store';
 import Loading from '@/components/Loading';
 import { fetchJobs } from '@/store/jobs';
+import ApplyButton from '@/components/ApplyButton';
 
 export default function JobDetail() {
   // TODO: using json server I was only able to use localhost/jobs but not localhost/jobs/{index}. will revise to use index in the future
@@ -24,14 +24,14 @@ export default function JobDetail() {
       setError('Invalid job ID');
     } else {
       const jobId = Number(lastPath);
-      const foundJob = jobList.find((job: JobListing) => job.id === jobId);
+      const foundJob = jobList.find((job: JobListing) => Number(job.id) === jobId);
       if (foundJob) {
         setJob(foundJob);
       } else {
         setError('Job not found');
       }
     }
-  }, [pathname, jobList]);
+  }, [pathname, job, jobList]);
 
   useEffect(() => {
     // @ts-ignore
@@ -45,13 +45,6 @@ export default function JobDetail() {
   if (!job) {
     return <Loading />;
   }
-
-  const handleApply = () => {
-    if (!session) {
-      openModal();
-    }
-    dispatch(applyJob(job.id));
-  };
 
   return (
     <div className="container mx-auto my-5">
@@ -74,20 +67,17 @@ export default function JobDetail() {
       <div className="p-4">
         <p className="text-lg mb-4">{job.about}</p>
         <p className="mb-4">
-          <b>Address:</b> {job.address?.street}, {job.address?.city}, {job.address?.province}, {job.address?.postalCode}
-        </p>
-        <div className="flex justify-end">
-          {job.applyState && session ? (
-            <button className="btn btn-accent">Applied</button>
+          {!session ? (
+            <>
+              <b>Location:</b> {job.address?.province}
+            </>
           ) : (
             <>
-              <LoginDialog />
-              <button className="btn btn-primary" onClick={handleApply}>
-                Apply
-              </button>
+              <b>Address:</b> {job.address?.street}, {job.address?.city}, {job.address?.province}, {job.address?.postalCode}
             </>
           )}
-        </div>
+        </p>
+        <ApplyButton {...job} />
       </div>
     </div>
   );

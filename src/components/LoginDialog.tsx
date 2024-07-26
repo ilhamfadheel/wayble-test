@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useDispatch } from 'react-redux';
+import { setJustLoggedIn } from '@/store/store';
 
 export const openModal = () => {
   const modal = document.getElementById('login_modal');
@@ -11,6 +12,7 @@ export const openModal = () => {
 };
 
 export default function LoginDialog() {
+  const dispatch = useDispatch();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -39,6 +41,7 @@ export default function LoginDialog() {
     })
       .then((response) => {
         if (response?.ok) {
+          dispatch(setJustLoggedIn(true));
           const modal = document.getElementById('login_modal');
           if (modal instanceof HTMLDialogElement) {
             modal.close();
