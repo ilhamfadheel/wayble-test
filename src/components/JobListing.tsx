@@ -9,16 +9,25 @@ import Loading from '@/components/Loading';
 
 export default function JobListing() {
   const dispatch = useDispatch();
-  const { jobList } = useSelector((state: any) => state.jobSlice);
+  const { jobList, isLoading, error } = useSelector((state: any) => state.jobSlice);
 
   useEffect(() => {
     // @ts-ignore
     dispatch(fetchJobs());
   }, [dispatch]);
 
-  if (jobList.length === 0) {
+  if (isLoading) {
     return <Loading />;
   }
+
+  if (error) {
+    return <div className="flex flex-wrap justify-center">{error}</div>;
+  }
+
+  if (jobList.length === 0) {
+    return <div className="flex flex-wrap justify-center">No jobs found.</div>;
+  }
+
   return (
     <section className="flex flex-wrap justify-center gap-4 h-full overflow-y-auto pb-20">
       {jobList.map((job: JobListing) => (

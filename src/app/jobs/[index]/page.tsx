@@ -9,40 +9,43 @@ import { fetchJobs } from '@/store/jobs';
 import ApplyButton from '@/components/ApplyButton';
 
 export default function JobDetail() {
-  // TODO: using json server I was only able to use localhost/jobs but not localhost/jobs/{index}. will revise to use index in the future
   const router = useRouter();
   const dispatch = useDispatch();
   const { data: session } = useSession();
   const pathname = usePathname();
-  const { jobList } = useSelector((state: any) => state.jobSlice);
+  const { jobList, isLoading } = useSelector((state: any) => state.jobSlice); // Assuming you have isLoading in your slice
   const [job, setJob] = useState<JobListing | null>(null);
-  const [error, setError] = useState<String | null>('');
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const lastPath = pathname.split('/').pop();
-    if (isNaN(Number(lastPath))) {
-      setError('Invalid job ID');
-    } else {
-      const jobId = Number(lastPath);
-      const foundJob = jobList.find((job: JobListing) => Number(job.id) === jobId);
-      if (foundJob) {
-        setJob(foundJob);
-      } else {
-        setError('Job not found');
-      }
-    }
-  }, [pathname, job, jobList]);
-
+  // Fetch jobs initially
   useEffect(() => {
     // @ts-ignore
     dispatch(fetchJobs());
   }, [dispatch]);
 
+  // Find job after jobList is updated or pathname changes
+  useEffect(() => {
+    if (!isLoading && jobList.length > 0) {
+      const lastPath = pathname.split('/').pop();
+      if (isNaN(Number(lastPath))) {
+        setError('Invalid job ID');
+      } else {
+        const jobId = Number(lastPath);
+        const foundJob = jobList.find((job: JobListing) => Number(job.id) === jobId);
+        if (foundJob) {
+          setJob(foundJob);
+        } else {
+          setError('Job not found');
+        }
+      }
+    }
+  }, [pathname, jobList, isLoading]);
+
   if (error) {
-    return <div>{error}</div>;
+    return <div className="flex flex-wrap justify-center">{error}</div>;
   }
 
-  if (!job) {
+  if (isLoading || !job) {
     return <Loading />;
   }
 

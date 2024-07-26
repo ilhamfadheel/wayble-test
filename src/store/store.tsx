@@ -5,11 +5,11 @@ import storage from 'redux-persist/lib/storage';
 import { thunk } from 'redux-thunk';
 import logger, { createLogger } from 'redux-logger';
 
-// const API_URL: any = process.env.API_ENDPOINT;
-
 interface JobState {
   jobList: JobListing[];
   justLoggedIn: boolean;
+  isLoading: boolean;
+  error: string | null;
 }
 
 export interface JobListing {
@@ -30,13 +30,14 @@ export interface JobListing {
 const initialState: JobState = {
   jobList: [],
   justLoggedIn: false,
+  isLoading: false,
+  error: null,
 };
 
 const jobSlice = createSlice({
   name: 'appliedJobsSlice',
   initialState,
   reducers: {
-    // TODO: can add applyState variable to the jobs.json objects and update the endpoint using axios
     applyJob: (state, action: PayloadAction<number>) => {
       const jobIndex = state.jobList.findIndex((job) => job.id === action.payload);
       if (jobIndex !== -1) {
@@ -58,9 +59,19 @@ const jobSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchJobs.fulfilled, (state, action) => {
-      state.jobList = action.payload;
-    });
+    builder
+      .addCase(fetchJobs.pending, (state) => {
+        state.isLoading = true;
+        state.error = null; // Reset error state
+      })
+      .addCase(fetchJobs.fulfilled, (state, action) => {
+        state.jobList = action.payload;
+        state.isLoading = false;
+      })
+      .addCase(fetchJobs.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Failed to fetch jobs';
+      });
   },
 });
 
@@ -68,11 +79,6 @@ const persistConfig = {
   key: 'root',
   storage,
 };
-
-const loggerMiddleware = createLogger({
-  duration: true,
-  diff: false,
-});
 
 const persistedReducer = persistReducer(persistConfig, jobSlice.reducer);
 
