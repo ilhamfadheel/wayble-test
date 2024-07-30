@@ -13,17 +13,15 @@ export default function JobDetail() {
   const dispatch = useDispatch();
   const { data: session } = useSession();
   const pathname = usePathname();
-  const { jobList, isLoading } = useSelector((state: any) => state.jobSlice); // Assuming you have isLoading in your slice
+  const { jobList, isLoading } = useSelector((state: any) => state.jobSlice);
   const [job, setJob] = useState<JobListing | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch jobs initially
   useEffect(() => {
     // @ts-ignore
     dispatch(fetchJobs());
   }, [dispatch]);
 
-  // Find job after jobList is updated or pathname changes
   useEffect(() => {
     if (!isLoading && jobList.length > 0) {
       const lastPath = pathname.split('/').pop();

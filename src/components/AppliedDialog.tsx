@@ -1,15 +1,38 @@
-import { JobListing } from '@/store/store';
+'use client';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { clearQueue } from '@/store/store';
 
-export const openAppliedModal = () => {
-  const modal = document.getElementById('applied_modal');
-  if (modal instanceof HTMLDialogElement) {
-    modal.showModal();
+export default function AppliedDialog() {
+  const dispatch = useDispatch();
+  const { appliedJob } = useSelector((state: any) => state.jobSlice);
+
+  useEffect(() => {
+    const modal = document.getElementById('applied_modal');
+    const handleClose = () => {
+      dispatch(clearQueue());
+    };
+
+    if (modal instanceof HTMLDialogElement) {
+      if (appliedJob) {
+        modal.showModal();
+      }
+      modal.addEventListener('close', handleClose);
+    }
+
+    return () => {
+      if (modal instanceof HTMLDialogElement) {
+        modal.removeEventListener('close', handleClose);
+      }
+    };
+  }, [appliedJob, dispatch]);
+
+  if (!appliedJob) {
+    return null;
   }
-};
 
-export default function AppliedDialog(job: JobListing) {
   return (
-    <dialog id="applied_modal" className="modal">
+    <dialog id={`applied_modal`} className="modal">
       <div className="modal-box">
         <form method="dialog">
           <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
@@ -18,7 +41,7 @@ export default function AppliedDialog(job: JobListing) {
           <b>Applied successfully</b>
         </h1>
         <p>
-          You’ve applied to {job.companyName} to work as a {job.jobTitle}
+          You’ve applied to {appliedJob.companyName} to work as a {appliedJob.jobTitle}
         </p>
       </div>
     </dialog>

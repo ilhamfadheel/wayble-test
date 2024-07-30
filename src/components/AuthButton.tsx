@@ -1,6 +1,6 @@
 'use client';
 import { signOut, useSession } from 'next-auth/react';
-import LoginDialog, { openModal } from '@/components/LoginDialog';
+import LoginDialog, { openLoginModal } from '@/components/LoginDialog';
 import { useDispatch } from 'react-redux';
 import { userLogout } from '@/store/store';
 
@@ -27,7 +27,7 @@ export default function AuthButton() {
     <>
       {/* @ts-ignore */}
       <LoginDialog />
-      <button className="btn btn-primary" onClick={() => openModal()}>
+      <button className="btn btn-primary" onClick={() => openLoginModal()}>
         Login
       </button>
     </>

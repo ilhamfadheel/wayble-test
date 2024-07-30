@@ -7,13 +7,13 @@ export const fetchJobs = createAsyncThunk('jobs/fetchJobs', async (_, { getState
     const response = await axios.get('http://localhost:8000/jobs');
     const newJobs = response.data.map((job: JobListing) => ({
       ...job,
-      applyState: job.applyState !== undefined ? job.applyState : false,
+      applyState: false,
     }));
 
     const state: any = getState();
     const previousJobList: JobListing[] = state.jobSlice.jobList;
 
-    const updatedJobList = newJobs.filter((newJob) => !previousJobList.some((prevJob) => prevJob.id === newJob.id));
+    const updatedJobList = newJobs.filter((newJob: JobListing) => !previousJobList.some((prevJob) => prevJob.id === newJob.id));
 
     if (updatedJobList.length > 0) {
       return [...previousJobList, ...updatedJobList];

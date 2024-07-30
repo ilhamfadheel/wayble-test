@@ -3,10 +3,12 @@ import { fetchJobs } from '@/store/jobs';
 import { persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { thunk } from 'redux-thunk';
-import logger, { createLogger } from 'redux-logger';
+import logger from 'redux-logger';
 
 interface JobState {
   jobList: JobListing[];
+  queue: number | null;
+  appliedJob: JobListing | null;
   justLoggedIn: boolean;
   isLoading: boolean;
   error: string | null;
@@ -29,6 +31,8 @@ export interface JobListing {
 
 const initialState: JobState = {
   jobList: [],
+  queue: null,
+  appliedJob: null,
   justLoggedIn: false,
   isLoading: false,
   error: null,
@@ -46,23 +50,42 @@ const jobSlice = createSlice({
           applyState: true,
         };
       }
+      state.appliedJob = state.jobList.find((job) => job.id === action.payload) || null;
+    },
+    queueJob: (state, action: PayloadAction<JobListing>) => {
+      state.queue = action.payload.id;
+    },
+    clearQueue: (state) => {
+      state.queue = null;
+      state.appliedJob = null;
     },
     setJustLoggedIn: (state, action: PayloadAction<boolean>) => {
       state.justLoggedIn = action.payload;
+      if (!state.queue) {
+        const jobIndex = state.jobList.findIndex((job) => job.id === state.queue);
+        if (jobIndex !== -1) {
+          state.jobList[jobIndex] = {
+            ...state.jobList[jobIndex],
+            applyState: true,
+          };
+        }
+      }
     },
     userLogout: (state) => {
       state.justLoggedIn = false;
+      state.queue = null;
       state.jobList = state.jobList.map((job) => ({
         ...job,
         applyState: false,
       }));
+      state.appliedJob = null;
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchJobs.pending, (state) => {
         state.isLoading = true;
-        state.error = null; // Reset error state
+        state.error = null;
       })
       .addCase(fetchJobs.fulfilled, (state, action) => {
         state.jobList = action.payload;
@@ -82,7 +105,7 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, jobSlice.reducer);
 
-export const { applyJob, setJustLoggedIn, userLogout } = jobSlice.actions;
+export const { applyJob, queueJob, clearQueue, setJustLoggedIn, userLogout } = jobSlice.actions;
 
 const store = configureStore({
   reducer: {

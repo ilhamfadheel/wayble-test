@@ -4,7 +4,7 @@ import { signIn } from 'next-auth/react';
 import { useDispatch } from 'react-redux';
 import { setJustLoggedIn } from '@/store/store';
 
-export const openModal = () => {
+export const openLoginModal = () => {
   const modal = document.getElementById('login_modal');
   if (modal instanceof HTMLDialogElement) {
     modal.showModal();

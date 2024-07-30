@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import '@/app/globals.css';
 import { Providers } from '@/store/provider';
 import Navbar from '@/components/Navbar';
+import AppliedDialog from '@/components/AppliedDialog';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -13,13 +14,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Providers>
-      <html lang="en">
-        <body className={inter.className}>
+    <html lang="en">
+      <body className={inter.className}>
+        <Providers>
+          <AppliedDialog />
           <Navbar />
           {children}
-        </body>
-      </html>
-    </Providers>
+        </Providers>
+      </body>
+    </html>
   );
 }

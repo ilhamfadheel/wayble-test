@@ -1,6 +1,6 @@
 {
   "name": "wayble-test",
-  "version": "1.0",
+  "version": "1.1",
   "private": false,
   "author": "Ilham Fadhil <Ilham@ilhamfadhil.com>",
   "scripts": {
@@ -10,7 +10,8 @@
     "lint": "next lint",
     "json-server": "json-server --watch db/jobs.json --port 8000",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "ngrok": "ngrok http 3000"
   },
   "keywords": [
     "nextjs",
